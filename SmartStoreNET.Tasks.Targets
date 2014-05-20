@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+	
+	<!-- General -->
+	<UsingTask TaskName="TransformXml" AssemblyFile="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v12.0\Web\Microsoft.Web.Publishing.Tasks.dll"/>
+
+	<!-- Initialization -->
+
+	<PropertyGroup>
+		<Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
+		<Platform Condition="'$(Platform)' == ''">Any CPU</Platform>
+		<Platform Condition="'$(Platform)' == 'MCD'">Any CPU</Platform>
+
+		<RootFolder>$(MSBuildProjectDirectory)</RootFolder>
+		<LibFolder>$(RootFolder)\lib</LibFolder>
+		<SrcFolder>$(RootFolder)\src</SrcFolder>
+		<SlnName>SmartStoreNET</SlnName>
+		<BuildFolder>$(RootFolder)\build</BuildFolder>
+		<MsBuildTasksFolder>$(RootFolder)\buildtasks</MsBuildTasksFolder>
+		<ArtifactsFolder>$(RootFolder)\artifacts</ArtifactsFolder>
+		<SqlCeFolder>$(LibFolder)\sqlce</SqlCeFolder>
+		<V8Folder>$(LibFolder)\ClearScript.V8</V8Folder>
+		<SourceArtifactFolder>$(ArtifactsFolder)\Source</SourceArtifactFolder>
+		<MsDeployArtifactFolder>$(ArtifactsFolder)\MsDeploy</MsDeployArtifactFolder>
+		<GalleryArtifactFolder>$(ArtifactsFolder)\Gallery</GalleryArtifactFolder>
+		<PluginsSrcFolder>$(SrcFolder)\Plugins</PluginsSrcFolder>
+		<WebFolder>$(SrcFolder)\Presentation\SmartStore.Web</WebFolder>
+		<WebPluginsFolder>$(WebFolder)\Plugins</WebPluginsFolder>
+		<WebThemesFolder>$(WebFolder)\Themes</WebThemesFolder>
+
+		<CompileFolder>$(BuildFolder)\Compile</CompileFolder>
+		<WebSitesFolder>$(CompileFolder)\_PublishedWebsites</WebSitesFolder>
+		<StageFolder>$(BuildFolder)\Web</StageFolder>
+		<MsDeployFolder>$(BuildFolder)\MsDeploy</MsDeployFolder>
+		<PrecompiledFolder>$(BuildFolder)\Precompiled</PrecompiledFolder>
+		<ProfilingFolder>$(BuildFolder)\Profiling</ProfilingFolder>
+		<GalleryFolder>$(BuildFolder)\Gallery</GalleryFolder>
+
+		<TransformInputFile>$(WebFolder)\Web.config</TransformInputFile>
+		<TransformFile>$(WebFolder)\Web.$(Configuration).config</TransformFile>
+		<TransformOutputFile>$(StageFolder)\Web.config</TransformOutputFile>
+
+		<BuildPlatform Condition="$(ProgramW6432) != ''">x64</BuildPlatform>
+		<BuildPlatform Condition="$(BuildPlatform) == ''">x86</BuildPlatform>
+
+		<xVersion>$(BUILD_NUMBER)</xVersion>
+		<Version>2.0.2</Version>
+		<ZipDirectory>$(StageFolder)</ZipDirectory>
+		<ZipVersionFileSuffix Condition="$(Version) != ''">.$(Version)</ZipVersionFileSuffix>
+		<ZipVersionFileSuffix Condition="$(Version) == ''"></ZipVersionFileSuffix>
+		<ZipFileSuffix>.Web</ZipFileSuffix>
+	</PropertyGroup>
+
+	<Import Project="$(LibFolder)\MSBuild\MSBuild.Community.Tasks.Targets"/>
+	<Import Project="$(LibFolder)\MSBuild\Extensions\MSBuild.ExtensionPack.VersionNumber.targets"/>
+  
+	<!-- Coordinating Targets -->
+
+	<Target Name="Build">
+		<CallTarget Targets="Clean"/>
+		<CallTarget Targets="Compile"/>
+	</Target>
+	
+	<Target Name="BuildFull">
+		<CallTarget Targets="Clean"/>
+		<CallTarget Targets="Compile"/>
+		<CallTarget Targets="Test"/>
+	</Target>
+
+	<Target Name="Deploy">
+		<CallTarget Targets="Clean"/>
+		<CallTarget Targets="Compile"/>
+		<CallTarget Targets="Stage"/>
+	</Target>
+	
+	<Target Name="DeployFull">
+		<CallTarget Targets="Clean"/>
+		<CallTarget Targets="Compile"/>
+		<CallTarget Targets="Test"/>
+		<CallTarget Targets="Stage"/>
+	</Target>
+  
+	<!-- Building -->
+
+	<Target Name="Clean">
+		<!-- delete Web/Plugins folder -->
+		<RemoveDir Directories="$(WebPluginsFolder)" ContinueOnError="false" />
+		<!-- "clean" solution -->
+		<MSBuild Projects="$(SrcFolder)\$(SlnName).sln" Targets="Clean" />
+	</Target>
+
+	<Target Name="Compile">
+		<!-- compile solution -->
+		<MSBuild Projects="$(SrcFolder)\$(SlnName).sln" Targets="Build" Properties="Configuration=$(Configuration);Platform=$(Platform)" />
+	</Target>
+  
+	<Target Name="Stage" DependsOnTargets="Build">
+
+		<ItemGroup>
+			<PluginFiles Include="$(WebPluginsFolder)\**\*" />
+			<MigrationFiles Include="$(WebFolder)\App_Data\Migrations\**\*.sql" />
+			<MigrationFiles Include="$(WebFolder)\App_Data\Migrations\**\*.txt" />
+			<UploadedImages Include="$(WebFolder)\Media\uploaded\**\*" />
+		  	<SqlCe-Native-Binaries-x86 Include="$(SqlCeFolder)\x86\**\*"/>
+		  	<SqlCe-Native-Binaries-amd64 Include="$(SqlCeFolder)\amd64\**\*"/>
+		  	<V8-Libs Include="$(V8Folder)\lib\**\*"/>
+		  	<V8-Native-Binaries-x86 Include="$(V8Folder)\Native\x86\**\*"/>
+		  	<V8-Native-Binaries-amd64 Include="$(V8Folder)\Native\amd64\**\*"/>
+		</ItemGroup>
+
+		<!-- delete the build folder -->
+		<RemoveDir Directories="$(BuildFolder)" ContinueOnError="true"/>
+
+		 <!-- create required target folders -->
+		<MakeDir Directories="$(BuildFolder)" />
+		<MakeDir Directories="$(StageFolder)" />
+		<MakeDir Directories="$(StageFolder)\Plugins\bin\" />
+		<MakeDir Directories="$(StageFolder)\App_Data\Migrations\" />
+
+		<!-- publish SmartStore.Web -->
+		<MSBuild Projects="$(WebFolder)\SmartStore.Web.csproj"
+		   Targets="ResolveReferences;_CopyWebApplication"
+		   Properties="WebProjectOutputDir=$(StageFolder)\;
+		   OutDir=$(StageFolder)\bin\;Configuration=$(Configuration)" />
+
+		<!-- copy the plugins to the stage directory -->
+		<Copy SourceFiles="@(PluginFiles)" DestinationFolder="$(StageFolder)\Plugins\%(RecursiveDir)" />
+		
+		<!-- copy the migration sql scripts to the stage directory -->
+		<Copy SourceFiles="@(MigrationFiles)" DestinationFolder="$(StageFolder)\App_Data\Migrations\%(RecursiveDir)" />
+
+		<!-- publish SmartStore.Admin -->
+		<MSBuild Projects="$(WebFolder)\Administration\SmartStore.Admin.csproj"
+		   Targets="ResolveReferences;_CopyWebApplication"
+		   Properties="WebProjectOutputDir=$(StageFolder)\Administration\;
+		   OutDir=$(StageFolder)\Administration\bin\;Configuration=$(Configuration)" />
+
+		<!-- move SmartStore.Admin/bin/ to the root bin/ -->
+        <CreateItem Include="$(StageFolder)\Administration\bin\*.dll">
+            <Output TaskParameter="Include" ItemName="AdminCompileOutput" />
+        </CreateItem>
+		<Copy SourceFiles="@(AdminCompileOutput)" DestinationFolder="$(StageFolder)\bin\" />
+
+		<!-- delete the bin in SmartStore.Admin -->
+		<RemoveDir Directories="$(StageFolder)\Administration\bin\" />
+
+		<!-- delete the packages.config files -->
+		<Delete Files="$(StageFolder)\Administration\packages.config; $(StageFolder)\packages.config"/>
+
+		<!-- copy \Media\uploaded\ folder to stage -->
+		<!--<RemoveDir Directories="$(StageFolder)\Media\uploaded\" />
+		<Copy SourceFiles="@(UploadedImages)" DestinationFolder="$(StageFolder)\Media\uploaded\%(RecursiveDir)" SkipUnchangedFiles="true" OverwriteReadOnlyFiles="true" />-->
+
+		<!-- copy SQL Compact native binaries-->
+		<Copy SourceFiles="@(SqlCe-Native-Binaries-x86)" DestinationFolder="$(StageFolder)\bin\x86\%(RecursiveDir)" />
+		<Copy SourceFiles="@(SqlCe-Native-Binaries-amd64)" DestinationFolder="$(StageFolder)\bin\amd64\%(RecursiveDir)" />
+		
+		<!-- copy ClearScript.V8 Javascript engine files -->
+		<Copy SourceFiles="@(V8-Libs)" DestinationFolder="$(StageFolder)\bin\ClearScript.V8\%(RecursiveDir)" />
+		<Copy SourceFiles="@(V8-Native-Binaries-x86)" DestinationFolder="$(StageFolder)\bin\x86\%(RecursiveDir)" />
+		<Copy SourceFiles="@(V8-Native-Binaries-amd64)" DestinationFolder="$(StageFolder)\bin\amd64\%(RecursiveDir)" />
+
+		<!-- transform config files -->
+		<TransformXml Source="$(TransformInputFile)" Transform="$(TransformFile)" Destination="$(TransformOutputFile)" />
+
+		<!-- delete obsolete config files -->							
+		<Attrib Files="$(StageFolder)\Web.Release.config" ReadOnly="false"/>
+		<Attrib Files="$(StageFolder)\Web.Debug.config" ReadOnly="false"/>
+		<Delete Files="$(StageFolder)\Web.Release.config"/>
+		<Delete Files="$(StageFolder)\Web.Debug.config" />
+
+		<!-- extra processing of the staged config files -->
+		<XmlUpdate XmlFileName="$(TransformOutputFile)" XPath="/configuration/system.web/compilation/@debug" Value="false" />
+		<XmlUpdate XmlFileName="$(TransformOutputFile)" XPath="/configuration/system.web/trace/@enabled" Value="false" />
+		<XmlUpdate XmlFileName="$(TransformOutputFile)" XPath="/configuration/system.web/machineKey/@validationKey" Value="AutoGenerate" />
+		<XmlUpdate XmlFileName="$(TransformOutputFile)" XPath="/configuration/system.web/machineKey/@decryptionKey" Value="AutoGenerate" />
+
+	</Target>
+  
+	<Target Name="Package-Zip">
+		<ItemGroup>
+			<Zip-Files Include="$(ZipDirectory)\**\*" />
+		</ItemGroup>
+		
+		<Zip Files="@(Zip-Files)" WorkingDirectory="$(ZipDirectory)" ZipFileName="$(BuildFolder)\SmartStoreNET$(ZipFileSuffix)$(ZipVersionFileSuffix).zip" />
+	</Target>
+	
+	<!-- Testing -->
+
+	<Target Name="Test">
+		
+		<PropertyGroup>
+			<TestFolder>$(BuildFolder)\Compile</TestFolder>
+		</PropertyGroup>
+	
+		<!-- TeamCity support -->
+		<ItemGroup>
+			<NUnitAddinFiles Include="$(teamcity_dotnet_nunitaddin)-2.6.0.*" />
+		</ItemGroup>
+		<Copy SourceFiles="@(NUnitAddinFiles)" DestinationFolder="$(LibFolder)\nunit\addins" />
+
+		<!-- Compile to "OutputFolder" -->
+		<MSBuild Projects="$(SrcFolder)\$(SlnName).sln" Targets="Build" Properties="Configuration=$(Configuration);Platform=$(Platform);OutputPath=$(TestFolder)" />
+
+		<!-- Run unit test assemblies -->
+		<CreateItem Include="$(TestFolder)\*.Tests.dll">
+			<Output TaskParameter="Include" ItemName="TestAssemblies" />
+		</CreateItem>
+		
+		<!-- execute test -->
+		<Message Text="Executing test fixtures with NUnit... This is a long running process and could take a few minutes... Dont't panic ;-)"/>
+		<NUnit Assemblies="@(TestAssemblies)" ToolPath="$(LibFolder)\nunit" WorkingDirectory="$(TestFolder)" OutputXmlFile="$(BuildFolder)\SmartStoreNET.Tests.xml" />
+	</Target>
+
+</Project>
+
+
+
+
+
+

@@ -1,0 +1,42 @@
+﻿@model String
+@using SmartStore.Web.Framework.UI;
+@{
+    Html.AddScriptParts(true, "~/Content/editors/tinymce4/tinymce.gzip.js" ,"~/Content/editors/tinymce4/globalinit.js");
+	Html.AppendCssFileParts(ResourceLocation.Foot, true, "~/Content/editors/tinymce4/skins/smartstore/skin.smartstore.css");
+
+    var availableLangs = new string[] { "de", "en" };
+    var lang = WorkContext.WorkingLanguage.UniqueSeoCode.ToLower();
+    if (!availableLangs.Contains(lang))
+    {
+        lang = "en";
+    }
+
+	var forceRootBlock = "'p'";
+	if (ViewData.ContainsKey("ForceRootBlock") && (bool)ViewData["ForceRootBlock"] == false)
+	{
+		forceRootBlock = "false";
+	}
+}
+<script type="text/javascript">
+
+	$(function () {
+
+    	tinyMCE.init(
+            $.extend(
+                true,
+                {},
+                tiny_mce_global_config,
+                {
+    				selector: '#@ViewData.TemplateInfo.GetFullHtmlFieldId(string.Empty)',
+                	language: '@lang',
+                	content_css: '@Url.Content("~/Content/editors/tinymce4/skins/smartstore/content.smartstore.css")',
+					forced_root_block: @Html.Raw(forceRootBlock)
+                }
+            )
+        );
+
+    });
+
+</script>
+
+@Html.TextArea(string.Empty, ViewData.TemplateInfo.FormattedModelValue)

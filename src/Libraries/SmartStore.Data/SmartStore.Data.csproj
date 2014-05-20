@@ -1,0 +1,353 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{CCD7F2C9-6A2C-4CF0-8E89-076B8FC0F144}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SmartStore.Data</RootNamespace>
+    <AssemblyName>SmartStore.Data</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'EFMigrations|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\EFMigrations\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'PluginDev|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\PluginDev\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Autofac, Version=3.3.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Autofac.3.3.1\lib\net40\Autofac.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\EntityFramework.6.1.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\EntityFramework.6.1.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServerCompact, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\EntityFramework.SqlServerCompact.6.1.0\lib\net45\EntityFramework.SqlServerCompact.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.ConnectionInfo, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\..\packages\Microsoft.SqlServer.Scripting.11.0.2100.61\lib\Microsoft.SqlServer.ConnectionInfo.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.Management.Sdk.Sfc, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\..\packages\Microsoft.SqlServer.Scripting.11.0.2100.61\lib\Microsoft.SqlServer.Management.Sdk.Sfc.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.Smo, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\..\packages\Microsoft.SqlServer.Scripting.11.0.2100.61\lib\Microsoft.SqlServer.Smo.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Newtonsoft.Json.6.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.SqlServerCe, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\..\packages\Microsoft.SqlServer.Compact.4.0.8876.1\lib\net40\System.Data.SqlServerCe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\AssemblySharedInfo.cs">
+      <Link>Properties\AssemblySharedInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\AssemblyVersionInfo.cs">
+      <Link>Properties\AssemblyVersionInfo.cs</Link>
+    </Compile>
+    <Compile Include="Migrations\201403112331027_Initial.cs" />
+    <Compile Include="Migrations\201403112331027_Initial.Designer.cs">
+      <DependentUpon>201403112331027_Initial.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201403210038385_AclPerf.cs" />
+    <Compile Include="Migrations\201403210038385_AclPerf.Designer.cs">
+      <DependentUpon>201403210038385_AclPerf.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201403211655284_CurrencyMorePrecision.cs" />
+    <Compile Include="Migrations\201403211655284_CurrencyMorePrecision.Designer.cs">
+      <DependentUpon>201403211655284_CurrencyMorePrecision.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201403251610279_AboutPage.cs" />
+    <Compile Include="Migrations\201403251610279_AboutPage.Designer.cs">
+      <DependentUpon>201403251610279_AboutPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201403262015448_ImportExcel.cs" />
+    <Compile Include="Migrations\201403262015448_ImportExcel.Designer.cs">
+      <DependentUpon>201403262015448_ImportExcel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201404032144400_Packaging.cs" />
+    <Compile Include="Migrations\201404032144400_Packaging.Designer.cs">
+      <DependentUpon>201404032144400_Packaging.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201404101903014_AttributeCombinationPrice.cs" />
+    <Compile Include="Migrations\201404101903014_AttributeCombinationPrice.Designer.cs">
+      <DependentUpon>201404101903014_AttributeCombinationPrice.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201404170814451_BundleYouSaveLabelFix.cs" />
+    <Compile Include="Migrations\201404170814451_BundleYouSaveLabelFix.Designer.cs">
+      <DependentUpon>201404170814451_BundleYouSaveLabelFix.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201404232319321_LessValidation.cs" />
+    <Compile Include="Migrations\201404232319321_LessValidation.Designer.cs">
+      <DependentUpon>201404232319321_LessValidation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201404292222025_FixMaxLength.cs" />
+    <Compile Include="Migrations\201404292222025_FixMaxLength.Designer.cs">
+      <DependentUpon>201404292222025_FixMaxLength.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Setup\Builder\SettingsBuilder.cs" />
+    <Compile Include="Setup\Builder\SettingsMigrator.cs" />
+    <Compile Include="Setup\DbMigrationContext.cs" />
+    <Compile Include="Extensions\IDbContextExtensions.cs" />
+    <Compile Include="Extensions\BaseEntityExtensions.cs" />
+    <Compile Include="Extensions\DataReaderExtensions.cs" />
+    <Compile Include="Extensions\DbContextExtensions.cs" />
+    <Compile Include="Extensions\MiscExtensions.cs" />
+    <Compile Include="Extensions\SqlDataReaderExtensions.cs" />
+    <Compile Include="Setup\DbMigrationException.cs" />
+    <Compile Include="Setup\DbSeedingMigrator.cs" />
+    <Compile Include="Setup\IDbMigrationExtensions.cs" />
+    <Compile Include="Setup\IDataSeeder.cs" />
+    <Compile Include="Setup\ILocaleResourcesProvider.cs" />
+    <Compile Include="Setup\InstallDatabaseInitializer.cs" />
+    <Compile Include="Setup\Builder\LocaleResourcesBuilder.cs" />
+    <Compile Include="Setup\Builder\LocaleResourcesMigrator.cs" />
+    <Compile Include="Setup\MigratorUtils.cs" />
+    <Compile Include="Setup\SeedData\SeedDataException.cs" />
+    <Compile Include="Setup\SeedData\SeedEntityExtensions.cs" />
+    <Compile Include="Setup\SeedData\SeedDataConfiguration.cs" />
+    <Compile Include="Setup\SeedData\InvariantSeedData.cs" />
+    <Compile Include="Setup\MigrateDatabaseInitializer.cs" />
+    <Compile Include="EfDataProviderFactory.cs" />
+    <Compile Include="IEfDataProvider.cs" />
+    <Compile Include="Mapping\Catalog\ProductBundleItemAttributeFilterMap.cs" />
+    <Compile Include="Mapping\Catalog\ProductBundleItemMap.cs" />
+    <Compile Include="Mapping\Stores\StoreMap.cs" />
+    <Compile Include="Mapping\Stores\StoreMappingMap.cs" />
+    <Compile Include="Mapping\Themes\ThemeVariableMap.cs" />
+    <Compile Include="Migrations\MigrationsConfiguration.cs" />
+    <Compile Include="ObjectContextBase.cs" />
+    <Compile Include="Mapping\Catalog\BackInStockSubscriptionMap.cs" />
+    <Compile Include="Mapping\Catalog\ManufacturerTemplateMap.cs" />
+    <Compile Include="Mapping\Catalog\CategoryTemplateMap.cs" />
+    <Compile Include="Mapping\Catalog\ProductTemplateMap.cs" />
+    <Compile Include="Mapping\Common\GenericAttributeMap.cs" />
+    <Compile Include="Mapping\Customers\ExternalAuthenticationRecordMap.cs" />
+    <Compile Include="Mapping\Directory\DeliveryTimeMap.cs" />
+    <Compile Include="Mapping\Security\AclRecordMap.cs" />
+    <Compile Include="Mapping\Seo\UrlRecordMap.cs" />
+    <Compile Include="Mapping\Shipping\ShipmentMap.cs" />
+    <Compile Include="Mapping\Shipping\ShipmentItemMap.cs" />
+    <Compile Include="Mapping\Tasks\ScheduleTaskMap.cs" />
+    <Compile Include="Setup\Builder\BuilderDbContextExtensions.cs" />
+    <Compile Include="Setup\TestDatabaseInitializer.cs" />
+    <Compile Include="SmartDbConfiguration.cs" />
+    <Compile Include="SqlServerDataProvider.cs" />
+    <Compile Include="SqlCeDataProvider.cs" />
+    <Compile Include="Mapping\Affiliates\AffiliateMap.cs" />
+    <Compile Include="Mapping\Catalog\ProductTagMap.cs" />
+    <Compile Include="Mapping\Catalog\ProductReviewHelpfulnessMap.cs" />
+    <Compile Include="Mapping\Common\AddressMap.cs" />
+    <Compile Include="Mapping\Blogs\BlogPostMap.cs" />
+    <Compile Include="Mapping\Blogs\BlogCommentMap.cs" />
+    <Compile Include="Mapping\News\NewsCommentMap.cs" />
+    <Compile Include="Mapping\News\NewsItemMap.cs" />
+    <Compile Include="Mapping\Customers\CustomerRoleMap.cs" />
+    <Compile Include="Mapping\Customers\RewardPointsHistoryMap.cs" />
+    <Compile Include="Mapping\Directory\MeasureWeightMap.cs" />
+    <Compile Include="Mapping\Directory\MeasureDimensionMap.cs" />
+    <Compile Include="Mapping\Directory\CurrencyMap.cs" />
+    <Compile Include="Mapping\Directory\CountryMap.cs" />
+    <Compile Include="Mapping\Discounts\DiscountUsageHistoryMap.cs" />
+    <Compile Include="Mapping\Discounts\DiscountMap.cs" />
+    <Compile Include="Mapping\Discounts\DiscountRequirementMap.cs" />
+    <Compile Include="Mapping\Forums\ForumGroupMap.cs" />
+    <Compile Include="Mapping\Forums\ForumMap.cs" />
+    <Compile Include="Mapping\Forums\ForumPostMap.cs" />
+    <Compile Include="Mapping\Forums\ForumSubscriptionMap.cs" />
+    <Compile Include="Mapping\Forums\ForumTopicMap.cs" />
+    <Compile Include="Mapping\Forums\PrivateMessageMap.cs" />
+    <Compile Include="Mapping\Logging\ActivityLogMap.cs" />
+    <Compile Include="Mapping\Logging\ActivityLogTypeMap.cs" />
+    <Compile Include="Mapping\Media\DownloadMap.cs" />
+    <Compile Include="Mapping\Messages\CampaignMap.cs" />
+    <Compile Include="Mapping\Messages\EmailAccountMap.cs" />
+    <Compile Include="Mapping\Messages\MessageTemplateMap.cs" />
+    <Compile Include="Mapping\Messages\NewsLetterSubscriptionMap.cs" />
+    <Compile Include="Mapping\Messages\QueuedEmailMap.cs" />
+    <Compile Include="Mapping\Orders\CheckoutAttributeMap.cs" />
+    <Compile Include="Mapping\Orders\CheckoutAttributeValueMap.cs" />
+    <Compile Include="Mapping\Orders\ReturnRequestMap.cs" />
+    <Compile Include="Mapping\Orders\RecurringPaymentHistoryMap.cs" />
+    <Compile Include="Mapping\Orders\RecurringPaymentMap.cs" />
+    <Compile Include="Mapping\Orders\OrderItemMap.cs" />
+    <Compile Include="Mapping\Orders\OrderNoteMap.cs" />
+    <Compile Include="Mapping\Orders\GiftCardMap.cs" />
+    <Compile Include="Mapping\Orders\GiftCardUsageHistoryMap.cs" />
+    <Compile Include="Mapping\Orders\ShoppingCartItemMap.cs" />
+    <Compile Include="Mapping\Orders\OrderMap.cs" />
+    <Compile Include="Mapping\Polls\PollMap.cs" />
+    <Compile Include="Mapping\Polls\PollVotingRecordMap.cs" />
+    <Compile Include="Mapping\Polls\PollAnswerMap.cs" />
+    <Compile Include="Mapping\Security\PermissionRecordMap.cs" />
+    <Compile Include="Mapping\Directory\StateProvinceMap.cs" />
+    <Compile Include="Mapping\Catalog\ProductReviewMap.cs" />
+    <Compile Include="Mapping\Customers\CustomerContentMap.cs" />
+    <Compile Include="Mapping\Catalog\ProductAttributeMap.cs" />
+    <Compile Include="Mapping\Localization\LocalizedPropertyMap.cs" />
+    <Compile Include="Mapping\Catalog\TierPriceMap.cs" />
+    <Compile Include="Mapping\Catalog\RelatedProductMap.cs" />
+    <Compile Include="Mapping\Catalog\CrossSellProductMap.cs" />
+    <Compile Include="Mapping\Catalog\ProductSpecificationAttributeMap.cs" />
+    <Compile Include="Mapping\Catalog\SpecificationAttributeOptionMap.cs" />
+    <Compile Include="Mapping\Catalog\SpecificationAttributeMap.cs" />
+    <Compile Include="Mapping\Catalog\ProductVariantAttributeValueMap.cs" />
+    <Compile Include="Mapping\Catalog\ProductVariantAttributeCombinationMap.cs" />
+    <Compile Include="Mapping\Catalog\ProductVariantAttributeMap.cs" />
+    <Compile Include="Mapping\Media\PictureMap.cs" />
+    <Compile Include="Mapping\Catalog\ProductPictureMap.cs" />
+    <Compile Include="Mapping\Catalog\ManufacturerMap.cs" />
+    <Compile Include="Mapping\Catalog\ProductManufacturerMap.cs" />
+    <Compile Include="Mapping\Catalog\ProductCategoryMap.cs" />
+    <Compile Include="Mapping\Catalog\CategoryMap.cs" />
+    <Compile Include="Mapping\Catalog\ProductMap.cs" />
+    <Compile Include="Mapping\Customers\CustomerMap.cs" />
+    <Compile Include="Mapping\Logging\LogMap.cs" />
+    <Compile Include="Mapping\Localization\LanguageMap.cs" />
+    <Compile Include="Mapping\Localization\LocaleStringResourceMap.cs" />
+    <Compile Include="Mapping\Configuration\SettingMap.cs" />
+    <Compile Include="Mapping\Shipping\ShippingMethodMap.cs" />
+    <Compile Include="Mapping\Tax\TaxCategoryMap.cs" />
+    <Compile Include="Mapping\Topics\TopicMap.cs" />
+    <Compile Include="SmartObjectContext.cs" />
+    <Compile Include="EfRepository.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SmartStore.Core\SmartStore.Core.csproj">
+      <Project>{6bda8332-939f-45b7-a25e-7a797260ae59}</Project>
+      <Name>SmartStore.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201403112331027_Initial.resx">
+      <DependentUpon>201403112331027_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201403210038385_AclPerf.resx">
+      <DependentUpon>201403210038385_AclPerf.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201403211655284_CurrencyMorePrecision.resx">
+      <DependentUpon>201403211655284_CurrencyMorePrecision.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201403251610279_AboutPage.resx">
+      <DependentUpon>201403251610279_AboutPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201403262015448_ImportExcel.resx">
+      <DependentUpon>201403262015448_ImportExcel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201404032144400_Packaging.resx">
+      <DependentUpon>201404032144400_Packaging.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201404101903014_AttributeCombinationPrice.resx">
+      <DependentUpon>201404101903014_AttributeCombinationPrice.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201404170814451_BundleYouSaveLabelFix.resx">
+      <DependentUpon>201404170814451_BundleYouSaveLabelFix.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201404232319321_LessValidation.resx">
+      <DependentUpon>201404232319321_LessValidation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201404292222025_FixMaxLength.resx">
+      <DependentUpon>201404292222025_FixMaxLength.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Sql\Indexes.sql" />
+    <EmbeddedResource Include="Sql\StoredProcedures.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Sql\Indexes.SqlServer.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Sql\Indexes.Inverse.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Sql\Indexes.SqlServer.Inverse.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Sql\StoredProcedures.Inverse.sql" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

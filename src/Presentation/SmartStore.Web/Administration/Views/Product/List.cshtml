@@ -1,0 +1,450 @@
+﻿@model ProductListModel
+@using Telerik.Web.Mvc.UI
+
+@* 
+    TODO: (MC) clean out comments 
+    TODO: (MC) get thumbnail dims and set <img> width/height to prevent flickering (maybe max-width/height)
+*@
+
+@{
+    var gridPageSize = EngineContext.Current.Resolve<SmartStore.Core.Domain.Common.AdminAreaSettings>().GridPageSize;
+    var trueTemplate = "#if (Published) {# <img src='" + Url.Content("~/Administration/Themes/SmartStore/Content/images/checkmark.png") + "' /> #} #";
+    
+    //page title
+    ViewBag.Title = T("Admin.Catalog.Products.Manage").Text;
+}
+@using (Html.BeginForm())
+{
+    <div class="section-header">
+        <div class="title">
+            <i class="icon icon-sitemap"></i>
+            @T("Admin.Catalog.Products.Manage")
+        </div>
+        <div class="options btn-toolbar">
+            <a href="@Url.Action("Create")" class="btn btn-primary">
+                <i class="icon-plus"></i>
+                @T("Admin.Common.AddNew")
+            </a>
+            @if (Model.DisplayPdfDownloadCatalog)
+            {
+                <a id="PdfDownloadCatalog" href="@Url.Action("DownloadCatalogAsPdf")" class="btn">
+					<i class="icon-download-alt"></i>&nbsp;@T("Admin.Catalog.Products.List.DownloadPDF")
+				</a>
+            }
+            <div class="btn-group" style="vertical-align: middle">
+              <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                Export
+                <span class="icon-caret-down"></span>
+              </a>
+              <ul class="dropdown-menu">
+                <li><a href="@Url.Action("ExportXmlAll")">@T("Admin.Common.ExportToXml.All")</a></li>
+                <li><a id="exportxml-selected" href="javascript:void(0)">@T("Admin.Common.ExportToXml.Selected")</a></li>
+                <li><a href="@Url.Action("ExportExcelAll")">@T("Admin.Common.ExportToExcel.All")</a></li>
+                <li><a id="exportexcel-selected" href="javascript:void(0)">@T("Admin.Common.ExportToExcel.Selected")</a></li>
+              </ul>
+            </div>
+            <a id="importexcel" href="#importexcel-window" class="btn" role="button">
+				<i class="icon-upload"></i>&nbsp;@T("Admin.Common.ImportFromExcel")
+			</a>
+            <button type="submit" id="delete-selected" class="btn btn-danger">
+				<i class="icon-trash"></i>
+				@T("Admin.Common.Delete.Selected")
+			</button>
+        </div>
+    </div>
+
+       <table style="width:100%">
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.SearchProductName)
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => Model.SearchProductName)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.SearchCategoryId)
+            </td>
+            <td class="adminData">
+                @Html.DropDownList("SearchCategoryId", Model.AvailableCategories, T("Admin.Common.All").Text)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.SearchManufacturerId)
+            </td>
+            <td class="adminData">
+                @Html.DropDownList("SearchManufacturerId", Model.AvailableManufacturers, T("Admin.Common.All").Text)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.SearchStoreId)
+            </td>
+            <td class="adminData">
+                @Html.DropDownList("SearchStoreId", Model.AvailableStores)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.SearchProductTypeId)
+            </td>
+            <td class="adminData">
+                @Html.DropDownList("SearchProductTypeId", Model.AvailableProductTypes)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.GoDirectlyToSku)
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => Model.GoDirectlyToSku)
+                <button type="submit" id="go-to-product-by-sku" name="go-to-product-by-sku" value="go-to-product-by-sku" class="btn">
+					<i class="icon-play-circle"></i>&nbsp;@T("Admin.Common.Go")
+				</button>
+            </td>
+        </tr>
+        <tr>
+			<td class="adminTitle">
+				&nbsp;
+			</td>
+            <td class="adminData">
+                <button type="submit" id="search-products" value="search-products" class="btn"><i class="icon-search"></i>&nbsp;@T("Admin.Common.Search")</button>
+            </td>
+        </tr>
+    </table>
+    <p>
+    </p>
+    <table class="adminContent">
+        <tr>
+            <td>
+                @(Html.Telerik().Grid<ProductModel>(Model.Products.Data)
+                    .Name("products-grid")
+                    .Columns(columns =>
+                    {
+                        columns.Bound(x => x.Id)
+                            .Filterable(false)
+                            .Template(x => string.Format("<input type='checkbox' name='checkedRecords' value='{0}' class='checkboxGroups'/>", x.Id))
+                            .ClientTemplate("<input type='checkbox' name='checkedRecords' value='<#= Id #>' class='checkboxGroups'/>")
+                            .Title("<input id='mastercheckbox' type='checkbox'/>")
+                            .Width(50)
+                            .HtmlAttributes(new { style = "text-align:center" })
+                            .HeaderHtmlAttributes(new { style = "text-align:center" });
+
+                        if (Model.DisplayProductPictures)
+                        {
+                            columns.Bound(x => x.PictureThumbnailUrl)
+                                .Width(50)
+                                .Template(
+                                    @<text>
+                                        <img alt="@item.Id" src="@item.PictureThumbnailUrl" @Html.Attr("class", "zoomable-thumb", !item.NoThumb) />
+                                    </text>
+                                )
+                                .ClientTemplate("<img alt='<#= Id #>' src='<#= PictureThumbnailUrl #>' <# if (!NoThumb) {#> class='zoomable-thumb' <# } #> />");
+                        }
+                        columns.Bound(x => x.Name)
+							.Template(x => @Html.LabeledProductName(x.Id, x.Name, x.ProductTypeName, x.ProductTypeLabelHint))
+							.ClientTemplate(@Html.LabeledProductName("Id", "Name"));
+                        columns.Bound(x => x.Sku);
+                        columns.Bound(x => x.Price)
+							.RightAlign();
+                        columns.Bound(x => x.StockQuantity)
+							.Centered();
+                        columns.Bound(x => x.Published)
+                            .Width(100)
+                            .Template(item => @Html.SymbolForBool(item.Published))
+                            .ClientTemplate(@Html.SymbolForBool("Published"))
+                            .Centered();
+                        columns.Bound(x => x.Id)
+                            .Width(50)
+                            .Centered()
+                            .Template(x => Html.ActionLink(T("Admin.Common.Edit").Text, "Edit", new { id = x.Id }))
+                            .ClientTemplate("<a href=\"Edit/<#= Id #>\">" + T("Admin.Common.Edit").Text + "</a>")
+                            .Title(T("Admin.Common.Edit").Text);
+                    })
+                    .Pageable(settings => settings.Total(Model.Products.Total).PageSize(gridPageSize).Position(GridPagerPosition.Both))
+                    .DataBinding(dataBinding => dataBinding.Ajax().Select("ProductList", "Product"))
+                    .ClientEvents(events => events.OnDataBinding("productsGrid_onDataBinding").OnDataBound("productsGrid_onDataBound"))
+                    .EnableCustomBinding(true))
+            </td>
+        </tr>
+    </table>
+    
+    <script type="text/javascript">
+
+        var selectedIds = [];
+
+        $(document).ready(function () {
+
+            $("#products-grid").thumbZoomer();
+
+            //search button
+            $('#search-products').click(function () {
+                //search
+                var grid = $('#products-grid').data('tGrid');
+                grid.currentPage = 1; //new search. Set page size to 1
+                grid.ajaxRequest();
+                //clear selected checkboxes
+                $('.checkboxGroups').attr('checked', false).change();
+                selectedIds = [];
+                return false;
+            });
+
+            $("#@Html.FieldIdFor(model => model.SearchProductName)").keydown(function (event) {
+                if (event.keyCode == 13) {
+                    $("#search-products").click();
+                    return false;
+                }
+            });
+            $("#@Html.FieldIdFor(model => model.GoDirectlyToSku)").keydown(function (event) {
+                if (event.keyCode == 13) {
+                    $("#go-to-product-by-sku").click();
+                    return false;
+                }
+            });
+
+            //"Export Excel selected" button
+            $('#exportexcel-selected').click(function (e) {
+                e.preventDefault();
+                //redirect to required URL
+                setLocation('@(Url.Action("ExportExcelSelected", "Product"))?selectedIds=' + selectedIds.join(","));
+                return false;
+            });
+
+            //"Export XML selected" button
+            $('#exportxml-selected').click(function (e) {
+                e.preventDefault();
+                //redirect to required URL
+                setLocation('@(Url.Action("ExportXmlSelected", "Product"))?selectedIds=' + selectedIds.join(","));
+                return false;
+            });
+
+            $('#mastercheckbox').click(function () {
+                $('.checkboxGroups').attr('checked', $(this).is(':checked')).change();
+            });
+
+            //"Delete (selected)" button
+            $('#delete-selected').click(function (e) {
+                e.preventDefault();
+                //redirect to required URL
+                setLocation('@(Url.Action("DeleteSelected", "Product"))?selectedIds=' + selectedIds.join(","));
+                return false;
+            });
+
+            //wire up checkboxes. 
+            $('#products-grid input[type=checkbox][id!=mastercheckbox]').live('change', function (e) {
+                var $check = $(this);
+                if ($check.is(":checked") == true) {
+                    var checked = jQuery.inArray($check.val(), selectedIds);
+                    if (checked == -1) {
+                        //add id to selectedIds.  
+                        selectedIds.push($check.val());
+                    }
+                }
+                else {
+                    var checked = jQuery.inArray($check.val(), selectedIds);
+                    if (checked > -1) {
+                        //remove id from selectedIds.  
+                        selectedIds = $.grep(selectedIds, function (item, index) {
+                            return item != $check.val();
+                        });
+                    }
+                }
+                productsGrid_updateMasterCheckbox();
+            });
+
+            $('#PdfDownloadCatalog').click(function (e) {
+            	if (!confirm(_.str.unescapeHTML('@T("Admin.Common.AskToProceed").Text'))) {
+            		e.preventDefault();
+            		return false;
+            	}
+            });
+        });
+
+        function productsGrid_onDataBinding(e) {
+            var searchModel = {
+                SearchProductName: $('#@Html.FieldIdFor(model => model.SearchProductName)').val(),
+                SearchCategoryId: $('#SearchCategoryId').val(),
+                SearchManufacturerId: $('#SearchManufacturerId').val(),
+                SearchStoreId: $('#SearchStoreId').val(),
+                SearchProductTypeId: $('#SearchProductTypeId').val()
+            };
+            e.data = searchModel;
+        }
+
+        function productsGrid_onDataBound(e) {
+            $('#products-grid input[type=checkbox][id!=mastercheckbox]').each(function () {
+                var currentId = $(this).val();
+                var checked = jQuery.inArray(currentId, selectedIds);
+                //set checked based on if current checkbox's value is in selectedIds.  
+                $(this).attr('checked', checked > -1);
+            });
+
+            productsGrid_updateMasterCheckbox();
+        }
+
+        function productsGrid_updateMasterCheckbox() {
+            var numChkBoxes = $('#products-grid input[type=checkbox][id!=mastercheckbox]').length;
+            var numChkBoxesChecked = $('#products-grid input[type=checkbox][checked][id!=mastercheckbox]').length;
+            $('#mastercheckbox').attr('checked', numChkBoxes == numChkBoxesChecked && numChkBoxes > 0);
+        }
+    </script>  
+}
+@*import products form*@
+@{Html.SmartStore().Window()
+        .Name("importexcel-window")
+        .Title(T("Admin.Common.ImportFromExcel").Text)
+        .Content(@<text>
+			@using (Html.BeginForm("ImportExcel", "Product", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal" }))
+            {
+				<div id="importexcel-last-result-summary" class="alert hide">
+
+				</div>
+
+				<div id="importexcel-upload" class="control-group">
+					<label class="control-label" for="importexcelfile">@T("Admin.Common.ExcelFile"):</label>
+					<div class="controls">
+						<input type="file" id="importexcelfile" name="importexcelfile" />
+					</div>
+				</div>
+				
+				<div id="importexcel-progress" class="hide">
+					<div class="progress progress-warning progress-striped active">
+						<div class="bar iep-bar" style="width: 0%;"></div>
+					</div>
+					<div class="iep-info muted">
+						@Html.Raw(T("Admin.Common.ImportFromExcel.ProcessedCount").ToString().FormatInvariant("<strong class='iep-processed'>0</strong>", "<strong class='iep-records'>0</strong>"))
+						@Html.Raw(T("Admin.Common.ImportFromExcel.ActiveSince").ToString().FormatCurrent("<span class='iep-elapsed'></span>"))
+					</div>
+					<div class="iep-info muted">
+						@(Html.Raw(T("Admin.Common.ImportFromExcel.QuickStats").ToString().FormatInvariant(
+							"<span class='iep-new'>0</span>", 
+							"<span class='iep-modified'>0</span>",
+							"<span class='iep-warnings'>0</span>",
+							"<span class='iep-errors'>0</span>")))
+					</div>
+				</div>
+            }
+
+            </text>)
+        .FooterContent(@<text>
+            <button id="importexcelsubmit" type="submit" data-action="import" class="btn btn-primary">@T("Admin.Common.ImportFromExcel")</button>
+            <a href="#" class="btn btn-link" data-dismiss="modal">@T("Common.Cancel")</a>
+        </text>)
+        .Modal(true)
+        .Visible(false)
+        .Render();
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+		
+    	var importProgressIntervall;
+    	var firstProgressCheck = true;
+    	var importRunning = true;
+		
+    	$('#importexcel').on('click', function (e) {
+    		e.preventDefault();
+    		var btn = $(this);
+
+    		if (!btn.data('initialized')) {
+    			checkImportProgress(false);
+    			btn.data('initialized', true);
+    		}
+
+    		$(btn.attr('href')).modal('toggle');
+    	});
+
+    	function checkImportProgress(async) {
+    		$.ajax({
+    			url: '@Url.Action("ImportExcelProgress", "Product")',
+    			dataType: "json",
+    			async: _.isBoolean(async) ? async : !firstProgressCheck,
+    			type: "POST",
+    			cache: false,
+				global: false,
+    			success: function (data, status) {
+    				var btn = $('#importexcelsubmit');
+
+    				if (data.LastResultSummary)
+    				{
+    					$('#importexcel-last-result-summary')
+							.html(data.LastResultSummary + "&nbsp;<a href='@Url.Action("ImportExcelDownloadReport", "Product")'>@T("Admin.Common.ImportFromExcel.DownloadReport")</a>")
+							.removeClass("alert-success alert-error")
+							.addClass(data.LastResultClass)
+							.removeClass("hide");
+    				}
+
+    				if (data.NoRunningTask) {
+    					window.clearInterval(importProgressIntervall);
+    					$('#importexcel-upload').show();
+    					$('#importexcel-progress').hide();
+    					if (btn.data('action') == 'cancel') {
+    						btn.removeClass("btn-danger")
+								.addClass("btn-primary")
+								.data('action', 'import')
+								.text('@T("Admin.Common.ImportFromExcel")');
+    					}
+    				}
+    				else {
+    					$('#importexcel-upload').hide();
+    					$('#importexcel-progress').show();
+    					if (btn.data('action') == 'import') {
+    						btn.removeClass("btn-primary")
+								.addClass("btn-danger")
+								.data('action', 'cancel')
+								.text('@T("Admin.Common.ImportFromExcel.Cancel")');
+    					}
+
+    					updateProgress(data.Progress);
+
+    					// start the checkprogress interval
+    					if (firstProgressCheck)
+    						importProgressIntervall = window.setInterval(checkImportProgress, 2000);
+    				}
+    			},
+    			error: function () {
+    				console.error(arguments[0].responseText);
+    			},
+    			complete: function () {
+    				firstProgressCheck = false;
+    			}
+    		});
+    	}
+
+    	function updateProgress(data) {
+    		var el = $('#importexcel-progress');
+    		var percent = Math.round(data.ProcessedPercent) + '%';
+
+    		el.find('.iep-bar').css('width', percent).text(percent);
+    		el.find('.iep-processed').text(data.TotalProcessed);
+    		el.find('.iep-records').text(data.TotalRecords);
+    		el.find('.iep-elapsed').text(_.formatTime(data.ElapsedTime.Seconds));
+    		el.find('.iep-new').text(data.NewRecords);
+    		el.find('.iep-modified').text(data.ModifiedRecords);
+    		el.find('.iep-warnings').text(data.TotalWarnings);
+    		el.find('.iep-errors').text(data.TotalErrors);
+
+    		importRunning = true;
+    	}
+
+    	$("#importexcelsubmit").click(function (e) {
+    		e.preventDefault();
+
+    		var btn = $(this);
+    		var win = $('#importexcel-window');
+
+    		if (btn.data('action') == 'import') {
+    			win.find("form").submit();
+    		}
+    		else {
+    			if (window.confirm('@T("Admin.Common.ImportFromExcel.CancelPrompt")')) {
+    				setLocation('@Url.Action("ImportExcelCancel", "Product")');
+    			}
+    		}
+        });
+
+    });
+</script>
+
+

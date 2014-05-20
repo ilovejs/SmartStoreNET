@@ -1,0 +1,255 @@
+﻿@model MessageTemplateModel
+
+@using SmartStore.Collections;
+@using SmartStore.Core.Domain.Catalog;
+@using SmartStore.Web.Framework.UI;
+@using Telerik.Web.Mvc.UI;
+
+@Html.ValidationSummary(false)
+@Html.HiddenFor(model => model.Id)
+
+@Html.SmartStore().TabStrip().Name("template-edit").Style(TabsStyle.Tabs).Position(TabsPosition.Top).Items(x =>
+{
+	x.Add().Text(T("Admin.Common.Info").Text).Content(TabInfo()).Selected(true);
+	x.Add().Text(T("Admin.Common.Stores").Text).Content(TabStores());
+
+    //generate an event
+	EngineContext.Current.Resolve<IEventPublisher>().Publish(new TabStripCreated(x, "template-edit", this.Html, this.Model));
+})
+
+@helper TokenSelector(TreeNode<string> root) 
+{
+    if (root.HasChildren)
+    {
+        <div class="btn-group message-token-selector">
+            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                @T("Admin.Common.ChooseToken")
+                <span class="caret"></span>
+            </a>
+            @TokenList(root)
+        </div>       
+    }
+}
+
+@helper TokenList(TreeNode<string> node)
+{
+    <ul class="dropdown-menu">
+        @foreach (var child in node.Children) 
+        {
+            if (child.IsLeaf)
+            {
+                List<string> tokens = new List<string>();
+                var curNode = child;
+                while (!curNode.IsRoot)
+                {
+                    tokens.Insert(0, curNode.Value);
+                    curNode = curNode.Parent;
+                }
+                <li><a tabindex="-1" href="#" class="message-token" @Html.Attr("data-token", String.Join(".", tokens), tokens.Count > 0)>@child.Value</a></li>
+            }
+            else
+            {
+                <li class="dropdown-submenu">
+                    <a tabindex="-1" href="#" class="message-token">@child.Value</a>
+                    @TokenList(child)
+                </li>
+            }
+        }
+    </ul>
+}
+
+@helper TabInfo()
+{  
+    <table class="adminContent" style="margin-bottom: 8px">
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.TokensTree)
+            </td>
+            <td class="adminData">
+                @TokenSelector(Model.TokensTree)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.Name)
+            </td>
+            <td class="adminData">
+                @Model.Name
+                @Html.HiddenFor(model => model.Name)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.IsActive)
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.IsActive)
+                @Html.ValidationMessageFor(model => model.IsActive)
+            </td>
+        </tr>
+    </table>
+	@(Html.LocalizedEditor<MessageTemplateModel, MessageTemplateLocalizedModel>("messagetemplate-localized",
+    @<table class="adminContent">
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.Locales[item].BccEmailAddresses)
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => Model.Locales[item].BccEmailAddresses)
+                @Html.ValidationMessageFor(model => model.Locales[item].BccEmailAddresses)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.Locales[item].Subject)
+            </td>
+            <td class="adminData">
+                @Html.TextBoxFor(model => Model.Locales[item].Subject, new { @class = "input-large" })
+                @Html.ValidationMessageFor(model => model.Locales[item].Subject)
+            </td>
+        </tr>
+        <tr>
+             <td class="adminTitle">
+                 @Html.SmartLabelFor(model => model.Locales[item].EmailAccountId)
+             </td>
+             <td class="adminData">
+                 @Html.DropDownListFor(model => Model.Locales[item].EmailAccountId, new SelectList(Model.AvailableEmailAccounts, "Id", "DisplayName", Model.Locales[item].EmailAccountId))
+                 @Html.ValidationMessageFor(model => model.Locales[item].EmailAccountId)
+             </td>
+         </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.Locales[item].Body)
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => Model.Locales[item].Body, "RichEditor")
+                @Html.ValidationMessageFor(model => model.Locales[item].Body)
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                @Html.HiddenFor(model => model.Locales[item].LanguageId)
+            </td>
+        </tr>
+    </table>
+    ,
+    @<table class="adminContent">
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.BccEmailAddresses)
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.BccEmailAddresses)
+                @Html.ValidationMessageFor(model => model.BccEmailAddresses)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.Subject)
+            </td>
+            <td class="adminData">
+                @Html.TextBoxFor(model => model.Subject, new { @class = "input-large" })
+                @Html.ValidationMessageFor(model => model.Subject)
+            </td>
+        </tr>
+        <tr>
+             <td class="adminTitle">
+                 @Html.SmartLabelFor(model => model.EmailAccountId)
+             </td>
+             <td class="adminData">
+                 @Html.DropDownListFor(model => model.EmailAccountId, new SelectList(Model.AvailableEmailAccounts, "Id", "DisplayName"))
+                 @Html.ValidationMessageFor(model => model.EmailAccountId)
+             </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.Body)
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.Body, "RichEditor")
+                @Html.ValidationMessageFor(model => model.Body)
+            </td>
+        </tr>
+    </table>
+    ))
+}
+
+@helper TabStores()
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $('.message-token-selector').on('click', '.message-token', function (e) {
+                e.preventDefault();
+
+                var el = $(this);
+                var token = el.data("token");
+
+                if (!token)
+                    return false;
+               
+
+                if (navigator.isIE) {
+                    // MSIE
+                    var editorId = $('.mceEditor:visible').prev().attr('id');
+                    var editor = tinymce.editors[editorId];
+                    if (editor) {
+                        editor.execCommand('mceInsertContent', false, '%{0}%'.format(token));
+                    }
+                }
+                else {
+                    tinyMCE.execCommand('mceInsertContent', false, '%{0}%'.format(token));
+                }
+                
+
+                return false;
+            });         
+
+            $("#@Html.FieldIdFor(model => model.LimitedToStores)").click(toggleStoreMapping);
+
+            toggleStoreMapping();
+        });
+
+
+        function toggleStoreMapping() {
+            if ($('#@Html.FieldIdFor(model => model.LimitedToStores)').is(':checked')) {
+                $('#pnl-available-stores').show();
+            }
+            else {
+                $('#pnl-available-stores').hide();
+            }
+        }
+
+    </script>
+    <table class="adminContent">
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.LimitedToStores)
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.LimitedToStores)
+                @Html.ValidationMessageFor(model => model.LimitedToStores)
+            </td>
+        </tr>
+        <tr id="pnl-available-stores">
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.AvailableStores)
+            </td>
+            <td class="adminData">
+                @if (Model.AvailableStores != null && Model.AvailableStores.Count > 0)
+                {
+                    foreach (var store in Model.AvailableStores)
+                    {
+					<label class="checkbox">
+						<input type="checkbox" name="SelectedStoreIds" value="@store.Id" checked="@(Model.SelectedStoreIds != null && Model.SelectedStoreIds.Contains(store.Id))" />
+						<span>@store.Name</span>
+					</label>
+                    }
+                }
+                else
+                {
+                    <div>@T("Admin.Configuration.Stores.NoStoresDefined")</div>
+                }</td>
+        </tr>
+    </table>
+}

@@ -1,0 +1,109 @@
+﻿@model CheckoutConfirmModel
+@using SmartStore.Core.Domain.Orders;
+@using SmartStore.Web.Models.Checkout;
+@using SmartStore.Web.Models.Common;
+@{
+    Layout = "~/Views/Shared/_Root.cshtml";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Checkout").Text);
+
+    //string termsLink = "<a id='terms-of-service-trigger' data-rel='dialog' href='#terms-of-service-modal'>";
+    //string disclaimerLink = "<a id='disclaimer-trigger' data-rel='dialog' href='#terms-of-service-modal'>";
+
+    string termsLink = "<a id='terms-of-service-trigger' data-rel='dialog' href='" + Url.RouteUrl("TopicPopup", new { SystemName = "ConditionsOfUse" }) + "'>";
+    string disclaimerLink = "<a id='disclaimer-trigger' data-rel='dialog' href='" + Url.RouteUrl("TopicPopup", new { SystemName = "Disclaimer" }) + "'>";
+    string terms = string.Format(T("Checkout.TermsOfService.IAccept"), termsLink, "</a>", disclaimerLink);
+}
+<div class="page checkout-page">
+    <div class="page-title">
+        <h1>@T("Checkout.ConfirmYourOrder")</h1>
+    </div>
+    <div class="page-body checkout-data">
+        @*set "data-ajax" attribute to "false"*@
+        @using (Html.BeginRouteForm("CheckoutConfirm", FormMethod.Post,
+                new Dictionary<string, Object> { { "data-ajax", "false" }, { "id", "confirm-order-form" } }))
+        {
+            @Html.Widget("mobile_checkout_confirm_top")
+
+            if (Model.Warnings.Count > 0)
+            {
+            <div class="message-error">
+                <ul>
+                    @for (int i = 0; i < Model.Warnings.Count; i++)
+                    {
+                        <li>@Model.Warnings[i]</li>
+                    }
+                </ul>
+            </div>
+            }
+            <script type="text/javascript">
+                $(function () {
+                    $('#confirm-order-form').submit(function () {
+                        $('#nextstep').addClass('ui-disabled');
+                    });
+                });
+            </script>
+            
+            if (Model.TermsOfServiceEnabled)
+            {
+                 <script type="text/javascript">
+                     $(function () {
+                         $("#terms-of-service-trigger", "#disclaimer-trigger").bind("tap", function (event, data) {
+                             event.stopPropagation();
+                         });
+                    });
+                </script>
+                
+                <label id="termsofservice-checkbox" class="">
+                    <input id="termsofservice" type="checkbox" name="termsofservice" />
+                    @Html.Raw(terms)
+                </label>
+            }
+        }
+        <div class="order-summary-body">
+            @Html.Action("OrderSummary", "ShoppingCart", new { prepareAndDisplayOrderReviewData = true })
+        </div>
+
+        <div class="confirm-order">
+            <div class="select-button">
+                @if (!String.IsNullOrEmpty(Model.MinOrderTotalWarning))
+                {
+                    @Model.MinOrderTotalWarning
+                }
+                else
+                {
+                      <script type="text/javascript">
+                        $(function () {
+                            $('.confirm-order-next-step-button').click(function () {
+                                //terms of services
+                                var termOfServiceOk = true;
+                                @if (Model.TermsOfServiceEnabled)
+                                {
+                                    <text>
+                                        if (!$('#termsofservice').is(':checked')) {
+                                            alert('@T("Checkout.TermsOfService.PleaseAccept")');
+                                            termOfServiceOk = false;
+                                        }
+                                        else {
+                                            termOfServiceOk = true;
+                                        }
+                                    </text>
+                                }
+                                if (termOfServiceOk) {
+                                    $('#confirm-order-form').submit();
+                                }
+                            });
+                        });
+                    </script>
+                    
+                    <button data-role="button" class="confirm-order-next-step-button" onclick="return false;" >
+                        @T("Checkout.ConfirmButton")
+                    </button>
+                }
+            </div>
+        </div>  
+        @Html.Widget("mobile_checkout_confirm_bottom")
+
+    </div>
+</div>

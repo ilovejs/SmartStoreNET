@@ -1,0 +1,199 @@
+﻿@model CurrencyModel
+
+@using Telerik.Web.Mvc.UI;
+@using SmartStore.Web.Framework.UI;
+
+@{
+    var availableDomainEndings = Model.AvailableDomainEndings.Select(x => x.Value).ToArray();
+    for (int i = 0; i < availableDomainEndings.Length; i++)
+    {
+        availableDomainEndings[i] = availableDomainEndings[i].EncodeJsString();
+    }
+    ViewBag.SerializedDomainEndings = String.Join(",", availableDomainEndings);
+}
+
+@Html.ValidationSummary(true)
+@Html.HiddenFor(model => model.Id)
+@Html.SmartStore().TabStrip().Name("currency-edit").Items(x =>
+{
+	x.Add().Text(T("Admin.Common.Info").Text).Content(TabInfo()).Selected(true);
+	x.Add().Text(T("Admin.Common.Stores").Text).Content(TabStores());
+
+    //generate an event
+	EngineContext.Current.Resolve<IEventPublisher>().Publish(new TabStripCreated(x, "currency-edit", this.Html, this.Model));
+})
+
+@helper TabInfo()
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            var domainEndings = $("#@Html.FieldIdFor(x => x.DomainEndings)");
+            domainEndings.select2({ tags: [@(Html.Raw(ViewBag.SerializedDomainEndings))] });
+
+        });
+    </script>
+
+    var cultures = System.Globalization.CultureInfo.GetCultures(System.Globalization.CultureTypes.SpecificCultures).ToList();
+    @(Html.LocalizedEditor<CurrencyModel, CurrencyLocalizedModel>("currency-info-localized",
+                @<table class="adminContent">
+                    <tr>
+                        <td class="adminTitle">
+                            @Html.SmartLabelFor(model => model.Locales[item].Name)
+                        </td>
+                        <td class="adminData">
+                            @Html.EditorFor(model => Model.Locales[item].Name)
+                            @Html.ValidationMessageFor(model => model.Locales[item].Name)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            @Html.HiddenFor(model => model.Locales[item].LanguageId)
+                        </td>
+                    </tr>
+                </table>
+                ,
+                @<table class="adminContent">
+                    <tr>
+                        <td class="adminTitle">
+                            @Html.SmartLabelFor(model => model.Name)
+                        </td>
+                        <td class="adminData">
+                            @Html.EditorFor(model => model.Name)
+                            @Html.ValidationMessageFor(model => model.Name)
+                        </td>
+                    </tr>
+                </table>
+            ))
+<table class="adminContent">
+    <tr>
+        <td class="adminTitle">
+            @Html.SmartLabelFor(model => model.CurrencyCode)
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.CurrencyCode)
+            @Html.ValidationMessageFor(model => model.CurrencyCode)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.SmartLabelFor(model => model.Rate)
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.Rate)
+            @Html.ValidationMessageFor(model => model.Rate)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.SmartLabelFor(model => model.DisplayLocale)
+        </td>
+        <td class="adminData">
+            @Html.DropDownListFor(x => x.DisplayLocale, cultures.Select(x => 
+                new SelectListItem { Value = x.IetfLanguageTag, Text = string.Format("{0} [{1}]", x.DisplayName, x.IetfLanguageTag) }))
+            @Html.ValidationMessageFor(model => model.DisplayLocale)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.SmartLabelFor(model => model.CustomFormatting)
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.CustomFormatting)
+            @Html.ValidationMessageFor(model => model.CustomFormatting)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.SmartLabelFor(model => model.DomainEndings)
+        </td>
+        <td class="adminData">
+            @Html.HiddenFor(model => model.DomainEndings)
+            @Html.ValidationMessageFor(model => model.DomainEndings)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.SmartLabelFor(model => model.Published)
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.Published)
+            @Html.ValidationMessageFor(model => model.Published)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.SmartLabelFor(model => model.DisplayOrder)
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.DisplayOrder)
+            @Html.ValidationMessageFor(model => model.DisplayOrder)
+        </td>
+    </tr>
+    @if (Model.Id > 0)
+    {
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.CreatedOn)
+            </td>
+            <td class="adminData">
+                @Html.DisplayFor(model => model.CreatedOn)
+            </td>
+        </tr>
+    }
+</table>
+}
+
+@helper TabStores()
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $("#@Html.FieldIdFor(model => model.LimitedToStores)").click(toggleStoreMapping);
+            toggleStoreMapping();
+
+        });
+
+
+        function toggleStoreMapping() {
+            if ($('#@Html.FieldIdFor(model => model.LimitedToStores)').is(':checked')) {
+                $('#pnl-available-stores').show();
+            }
+            else {
+                $('#pnl-available-stores').hide();
+            }
+        }
+
+    </script>
+    <table class="adminContent">
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.LimitedToStores)
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.LimitedToStores)
+                @Html.ValidationMessageFor(model => model.LimitedToStores)
+            </td>
+        </tr>
+        <tr id="pnl-available-stores">
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.AvailableStores)
+            </td>
+            <td class="adminData">
+                @if (Model.AvailableStores != null && Model.AvailableStores.Count > 0)
+                {
+                    foreach (var store in Model.AvailableStores)
+                    {
+					<label class="checkbox">
+						<input type="checkbox" name="SelectedStoreIds" value="@store.Id" checked="@(Model.SelectedStoreIds != null && Model.SelectedStoreIds.Contains(store.Id))" />
+						<span>@store.Name</span>
+					</label>
+                    }
+                }
+                else
+                {
+                    <div>@T("Admin.Configuration.Stores.NoStoresDefined")</div>
+                }</td>
+        </tr>
+    </table>
+}

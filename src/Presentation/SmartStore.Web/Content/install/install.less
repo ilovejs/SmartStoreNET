@@ -1,0 +1,157 @@
+/*
+ * Uses Bootstrap v2.2.1
+ *
+ * Copyright 2012 Twitter, Inc
+ * Licensed under the Apache License v2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Designed and built with all the love in the world @twitter by @mdo and @fat.
+ */
+
+// CSS Reset
+@import "~/Content/bootstrap/reset.less";
+
+// Core variables and mixins
+@import "variables.less";
+@import "variables.custom.less";
+@import "~/Content/bootstrap/mixins.less";
+@import "~/Content/bootstrap/custom/mixins.less";
+
+// Grid system and page structure
+@import "~/Content/bootstrap/scaffolding.less";
+@import "~/Content/bootstrap/grid.less";
+@import "~/Content/bootstrap/layouts.less";
+
+// Base CSS
+@import "~/Content/bootstrap/type.less";
+@import "~/Content/bootstrap/code.less";
+@import "~/Content/bootstrap/forms.less";
+@import "~/Content/bootstrap/tables.less";
+
+// Components: common
+@import "~/Content/bootstrap/font/font-awesome.less";
+@import "~/Content/bootstrap/dropdowns.less";
+@import "~/Content/bootstrap/wells.less";
+@import "~/Content/bootstrap/component-animations.less";
+@import "~/Content/bootstrap/close.less";
+
+// Components: Buttons & Alerts
+@import "~/Content/bootstrap/buttons.less";
+@import "~/Content/bootstrap/button-groups.less";
+@import "~/Content/bootstrap/alerts.less"; // Note: alerts share common CSS with buttons and thus have styles in buttons.less
+
+// Components: Nav
+@import "~/Content/bootstrap/navs.less";
+
+// Components: Popovers
+@import "~/Content/bootstrap/modals.less";
+@import "~/Content/bootstrap/tooltip.less";
+
+// Components: Misc
+@import "~/Content/bootstrap/labels-badges.less";
+@import "~/Content/bootstrap/progress-bars.less";
+
+// (MC) extra 3rd party or own components
+@import "~/Content/bootstrap/custom/throbber.less";
+
+// (MC) extra tweaks and corrections
+@import "~/Content/bootstrap/custom/custom.less";
+
+// Utility classes
+@import "~/Content/bootstrap/utilities.less"; // Has to be last to override when necessary
+
+.clearfix {
+	*zoom: 1;
+	&:before,
+	&:after {
+		display: table;
+		content: "";
+		// Fixes Opera/contenteditable bug:
+		// http://nicolasgallagher.com/micro-clearfix-hack/#comment-36952
+		line-height: 0;
+	}
+	&:after {
+		clear: both;
+	}
+}
+.hide-text {
+	font: 0/0 a;
+	color: transparent;
+	text-shadow: none;
+	background-color: transparent;
+	border: 0;
+}
+
+
+/* INSTALL STYLES
+--------------------------------------------------------*/
+@installBaseColor: #29b6d9;
+
+body {
+    background: @installBaseColor url('images/bg.png') 50% 0% no-repeat;
+    background-attachment: fixed;
+}
+
+.install-head {
+	padding: 8px 0;
+	line-height: 40px;
+	vertical-align: middle;
+}
+
+.install-panel {
+	margin-top: 4px;
+	margin-bottom: 20px;
+	padding: 30px;
+    background-color: #fff;
+    background-color: rgba(255,255,255, .5);
+    //text-shadow: 0 1px 0 rgba(255,255,255, .25);
+    .box-shadow(~'0 0 15px rgba(0,0,0, .15), 0 10px 6px -10px rgba(0,0,0, .4)');
+    .border-radius(4px);
+}
+
+.install-title {
+	margin: 0;
+	color: #fff;
+	color: lighten(@installBaseColor, 40%);
+	text-shadow: 0 1px 0 darken(@installBaseColor, 12%);
+}
+
+.install-content {
+	//padding: 0 30px;
+}
+
+.install-content legend {
+	font-family: @headingsFontFamily;
+	font-weight: @headingsFontWeight;
+	font-size: 22px;
+	border-bottom-color: lighten(@installBaseColor, 12%);
+	color: @headingsColor;
+	margin-bottom: 0;
+}
+
+.install-icon {
+	font-size: 32px;
+	line-height: 32px;
+	vertical-align: bottom;
+	margin-right: 4px;
+	display: none;
+}
+
+.form-horizontal .control-label {
+	width: 240px;
+}
+
+.form-horizontal .controls {
+	margin-left: 260px;
+}
+
+label.control-label {
+	font-weight: bold;
+}
+
+.field-validation-error {
+	color: red;
+	text-shadow: none !important;
+}
+
+

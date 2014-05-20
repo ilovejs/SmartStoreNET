@@ -1,0 +1,253 @@
+﻿@model ShoppingCartSettingsModel
+@{
+    //page title
+    ViewBag.Title = T("Admin.Configuration.Settings.ShoppingCart").Text;
+}
+@using (Html.BeginForm())
+{
+    <div class="section-header">
+        <div class="title">
+            <i class="icon icon-shopping-cart"></i>
+            @T("Admin.Configuration.Settings.ShoppingCart")
+        </div>
+        <div class="options">
+            <button type="submit" name="save" value="save" class="btn btn-primary"><i class="icon-ok icon-white"></i>&nbsp;@T("Admin.Common.Save")</button>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $("#@Html.FieldIdFor(model => model.MiniShoppingCartEnabled)").click(toggleMiniShoppingCartEnabled);
+            $("#@Html.FieldIdFor(model => model.EmailWishlistEnabled)").click(toggleEmailWishlistEnabled);
+
+            toggleMiniShoppingCartEnabled();
+            toggleEmailWishlistEnabled();
+        });
+
+        function toggleMiniShoppingCartEnabled() {
+            if ($('#@Html.FieldIdFor(model => model.MiniShoppingCartEnabled)').is(':checked')) {
+                $('#pnlMiniShoppingCartProductNumber').show();
+                $('#pnlShowProductImagesInMiniShoppingCart').show();
+            }
+            else {
+                $('#pnlMiniShoppingCartProductNumber').hide();
+                $('#pnlShowProductImagesInMiniShoppingCart').hide();
+            }
+        }
+
+        function toggleEmailWishlistEnabled() {
+            if ($('#@Html.FieldIdFor(model => model.EmailWishlistEnabled)').is(':checked')) {
+                $('#pnlAllowAnonymousUsersToEmailWishlist').show();
+            }
+            else {
+                $('#pnlAllowAnonymousUsersToEmailWishlist').hide();
+            }
+        }
+        
+    </script>
+    
+	@Html.Action("StoreScopeConfiguration", "Setting")
+	@Html.ValidationSummary(false)
+
+    <table class="adminContent">
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.DisplayCartAfterAddingProduct)
+            </td>
+            <td class="adminData">
+                @Html.SettingEditorFor(model => model.DisplayCartAfterAddingProduct)
+                @Html.ValidationMessageFor(model => model.DisplayCartAfterAddingProduct)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.DisplayWishlistAfterAddingProduct)
+            </td>
+            <td class="adminData">
+                @Html.SettingEditorFor(model => model.DisplayWishlistAfterAddingProduct)
+                @Html.ValidationMessageFor(model => model.DisplayWishlistAfterAddingProduct)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.AllowOutOfStockItemsToBeAddedToWishlist)
+            </td>
+            <td class="adminData">
+                @Html.SettingEditorFor(model => model.AllowOutOfStockItemsToBeAddedToWishlist)
+                @Html.ValidationMessageFor(model => model.AllowOutOfStockItemsToBeAddedToWishlist)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.MaximumShoppingCartItems)
+            </td>
+            <td class="adminData">
+                @Html.SettingEditorFor(model => model.MaximumShoppingCartItems)
+                @Html.ValidationMessageFor(model => model.MaximumShoppingCartItems)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.MaximumWishlistItems)
+            </td>
+            <td class="adminData">
+                @Html.SettingEditorFor(model => model.MaximumWishlistItems)
+                @Html.ValidationMessageFor(model => model.MaximumWishlistItems)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.ShowProductImagesOnShoppingCart)
+            </td>
+            <td class="adminData">
+                @Html.SettingEditorFor(model => model.ShowProductImagesOnShoppingCart)
+                @Html.ValidationMessageFor(model => model.ShowProductImagesOnShoppingCart)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.ShowProductBundleImagesOnShoppingCart)
+            </td>
+            <td class="adminData">
+                @Html.SettingEditorFor(model => model.ShowProductBundleImagesOnShoppingCart)
+                @Html.ValidationMessageFor(model => model.ShowProductBundleImagesOnShoppingCart)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.ShowProductImagesOnWishList)
+            </td>
+            <td class="adminData">
+                @Html.SettingEditorFor(model => model.ShowProductImagesOnWishList)
+                @Html.ValidationMessageFor(model => model.ShowProductImagesOnWishList)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.ShowProductBundleImagesOnWishList)
+            </td>
+            <td class="adminData">
+                @Html.SettingEditorFor(model => model.ShowProductBundleImagesOnWishList)
+                @Html.ValidationMessageFor(model => model.ShowProductBundleImagesOnWishList)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.ShowDiscountBox)
+            </td>
+            <td class="adminData">
+                @Html.SettingEditorFor(model => model.ShowDiscountBox)
+                @Html.ValidationMessageFor(model => model.ShowDiscountBox)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.ShowGiftCardBox)
+            </td>
+            <td class="adminData">
+                @Html.SettingEditorFor(model => model.ShowGiftCardBox)
+                @Html.ValidationMessageFor(model => model.ShowGiftCardBox)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.CrossSellsNumber)
+            </td>
+            <td class="adminData">
+                @Html.SettingEditorFor(model => model.CrossSellsNumber)
+                @Html.ValidationMessageFor(model => model.CrossSellsNumber)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.EmailWishlistEnabled)
+            </td>
+            <td class="adminData">
+                @Html.SettingEditorFor(model => model.EmailWishlistEnabled)
+                @Html.ValidationMessageFor(model => model.EmailWishlistEnabled)
+            </td>
+        </tr>
+        <tr id="pnlAllowAnonymousUsersToEmailWishlist">
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.AllowAnonymousUsersToEmailWishlist)
+            </td>
+            <td class="adminData">
+                @Html.SettingEditorFor(model => model.AllowAnonymousUsersToEmailWishlist)
+                @Html.ValidationMessageFor(model => model.AllowAnonymousUsersToEmailWishlist)
+            </td>
+        </tr>        
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.MiniShoppingCartEnabled)
+            </td>
+            <td class="adminData">
+                @Html.SettingEditorFor(model => model.MiniShoppingCartEnabled)
+                @Html.ValidationMessageFor(model => model.MiniShoppingCartEnabled)
+            </td>
+        </tr>
+        <tr id="pnlMiniShoppingCartProductNumber">
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.MiniShoppingCartProductNumber)
+            </td>
+            <td class="adminData">
+                @Html.SettingEditorFor(model => model.MiniShoppingCartProductNumber)
+                @Html.ValidationMessageFor(model => model.MiniShoppingCartProductNumber)
+            </td>
+        </tr>
+        <tr id="pnlShowProductImagesInMiniShoppingCart">
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.ShowProductImagesInMiniShoppingCart)
+            </td>
+            <td class="adminData">
+                @Html.SettingEditorFor(model => model.ShowProductImagesInMiniShoppingCart)
+                @Html.ValidationMessageFor(model => model.ShowProductImagesInMiniShoppingCart)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.ShowConfirmOrderLegalHint)
+            </td>
+            <td class="adminData">
+                @Html.SettingEditorFor(model => model.ShowConfirmOrderLegalHint)
+                @Html.ValidationMessageFor(model => model.ShowConfirmOrderLegalHint)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.ShowDeliveryTimes)
+            </td>
+            <td class="adminData">
+                @Html.SettingEditorFor(model => model.ShowDeliveryTimes)
+                @Html.ValidationMessageFor(model => model.ShowDeliveryTimes)
+            </td>
+        </tr>
+
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.ShowShortDesc)
+            </td>
+            <td class="adminData">
+                @Html.SettingEditorFor(model => model.ShowShortDesc)
+                @Html.ValidationMessageFor(model => model.ShowShortDesc)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.ShowBasePrice)
+            </td>
+            <td class="adminData">
+                @Html.SettingEditorFor(model => model.ShowBasePrice)
+                @Html.ValidationMessageFor(model => model.ShowBasePrice)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.ShowLinkedAttributeValueQuantity)
+            </td>
+            <td class="adminData">
+                @Html.SettingEditorFor(model => model.ShowLinkedAttributeValueQuantity)
+                @Html.ValidationMessageFor(model => model.ShowLinkedAttributeValueQuantity)
+            </td>
+        </tr>
+    </table>
+}

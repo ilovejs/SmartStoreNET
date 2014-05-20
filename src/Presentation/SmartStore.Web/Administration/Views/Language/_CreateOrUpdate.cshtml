@@ -1,0 +1,169 @@
+﻿@model LanguageModel
+
+@using Telerik.Web.Mvc.UI;
+@using SmartStore.Web.Framework.UI;
+
+@Html.ValidationSummary(true)
+@Html.HiddenFor(model => model.Id)
+@Html.SmartStore().TabStrip().Name("language-edit").Style(TabsStyle.Tabs).Position(TabsPosition.Top).Items(x =>
+{
+	x.Add().Text(T("Admin.Common.Info").Text).Content(TabInfo()).Selected(true);
+	x.Add().Text(T("Admin.Common.Stores").Text).Content(TabStores());
+
+    //generate an event
+	EngineContext.Current.Resolve<IEventPublisher>().Publish(new TabStripCreated(x, "language-edit", this.Html, this.Model));
+})
+
+@helper TabInfo()
+{
+	var cultures = System.Globalization.CultureInfo.GetCultures(System.Globalization.CultureTypes.SpecificCultures).ToList();
+<script type="text/javascript">
+    function toggleFlags() {
+        $('#pnlAllFlags').toggle();
+        if ($('#pnlAllFlags').css('display') == 'none') {
+            $('#displayAllFlags').html('@T("Admin.Common.Show")');
+        }
+        else {
+            $('#displayAllFlags').html('@T("Admin.Common.Hide")');
+        }
+    }
+</script>
+
+<table class="adminContent">
+    <tr>
+        <td class="adminTitle">
+            @Html.SmartLabelFor(model => model.Name)
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.Name)
+            @Html.ValidationMessageFor(model => model.Name)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.SmartLabelFor(model => model.LanguageCulture)
+        </td>
+        <td class="adminData">
+            @* codehint: sm-edit *@
+            @Html.DropDownListFor(x => x.LanguageCulture, cultures.Select(x => 
+                new SelectListItem { Value = x.IetfLanguageTag, Text = string.Format("{0} [{1}]", x.DisplayName, x.IetfLanguageTag) }))
+            @Html.ValidationMessageFor(model => model.LanguageCulture)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.SmartLabelFor(model => model.UniqueSeoCode)
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.UniqueSeoCode)
+            @Html.ValidationMessageFor(model => model.UniqueSeoCode)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.SmartLabelFor(model => model.FlagImageFileName)
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.FlagImageFileName)
+            @Html.ValidationMessageFor(model => model.FlagImageFileName)
+            <br/>
+            <a id="displayAllFlags" href="javascript:toggleFlags();">@T("Admin.Common.Show")</a>
+            <div id="pnlAllFlags" style="display: none">
+                @foreach (var fileName in Model.FlagFileNames)
+                {
+                    <a href="javascript: void(0)" class="flag" data-filename="@fileName">
+                        <img alt="" src="@Url.Content("~/Content/Images/flags/" + fileName)"/>
+                        @fileName
+                        <text>, </text>
+                    </a>
+                }
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.SmartLabelFor(model => model.Rtl)
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.Rtl)
+            @Html.ValidationMessageFor(model => model.Rtl)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.SmartLabelFor(model => model.Published)
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.Published)
+            @Html.ValidationMessageFor(model => model.Published)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.SmartLabelFor(model => model.DisplayOrder)
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.DisplayOrder)
+            @Html.ValidationMessageFor(model => model.DisplayOrder)
+        </td>
+    </tr>
+</table>
+}
+
+@helper TabStores()
+{
+    <script type="text/javascript">
+    	$(document).ready(function () {
+
+    		$("#@Html.FieldIdFor(model => model.LimitedToStores)").click(toggleStoreMapping);
+
+    	    toggleStoreMapping();
+
+    	    $("#pnlAllFlags a.flag").click(function () {
+    	        $("#FlagImageFileName").val($(this).data("filename"));
+    	    });
+        });
+
+
+        function toggleStoreMapping() {
+        	if ($('#@Html.FieldIdFor(model => model.LimitedToStores)').is(':checked')) {
+        		$('#pnl-available-stores').show();
+        	}
+        	else {
+        		$('#pnl-available-stores').hide();
+        	}
+        }
+
+    </script>
+    <table class="adminContent">
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.LimitedToStores)
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.LimitedToStores)
+                @Html.ValidationMessageFor(model => model.LimitedToStores)
+            </td>
+        </tr>
+        <tr id="pnl-available-stores">
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.AvailableStores)
+            </td>
+            <td class="adminData">
+                @if (Model.AvailableStores != null && Model.AvailableStores.Count > 0)
+                {
+                    foreach (var store in Model.AvailableStores)
+                    {
+					<label class="checkbox">
+						<input type="checkbox" name="SelectedStoreIds" value="@store.Id" checked="@(Model.SelectedStoreIds != null && Model.SelectedStoreIds.Contains(store.Id))" />
+						<span>@store.Name</span>
+					</label>						
+                    }
+                }
+                else
+                {
+                    <div>@T("Admin.Configuration.Stores.NoStoresDefined")</div>
+                }</td>
+        </tr>
+    </table>
+}
